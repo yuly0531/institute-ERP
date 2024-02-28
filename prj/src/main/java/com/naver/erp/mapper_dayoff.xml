@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.naver.erp.DayOffDAO">
+<sql id="dayoffWhere">
+	<if test="keyword1!=null and keyword1.length()>0">
+        and( upper((select stu_name from student st
+         where st.stu_id= d.stu_id))
+         	LIKE upper('%${keyword1}%') 
+   		or upper(d.dayoff_kind)
+         LIKE upper('%${keyword1}%')
+        or upper(d.payment_status)
+         LIKE upper('%${keyword1}%') )
+         </if>
+         <if test = "payment!='전체' and payment!=null and payment.length>0">
+            and d.PAYMENT_STATUS = #{payment}
+         </if>
+   
+</sql>
+
+<select id="getStuOffDetail" parameterType="java.lang.String" resultType="com.naver.erp.DayOffDTO" >
+
+select
+	to_char(d.APPLICATION_DATE,'YYYY-MM-DD AM HH:MI') "application_date" 
+	,to_char(d.DAYOFF_START,'YYYY-MM-DD AM HH:MI') "dayoff_start" 
+	,to_char(d.DAYOFF_END,'YYYY-MM-DD AM HH:MI') "dayoff_end"
+	,d.DAYOFF_KIND   "dayoff_kind" 
+	,d.stu_id "stu_id"                     
+	,(select stu_name from student st where st.stu_id= d.stu_id) "stu_name"                     
+	,d.PAYMENT_STATUS "payment_status"
+	,d.etc "etc"
+	from dayoff  d
+	where d.day_id =#{day_id}
+ </select> 
+
+
+<select id="getStuOffCnt" resultType="int" >
+	     select
+	       count(*)
+         from dayoff d
+         where 1=1
+         <include refid="dayoffWhere"/>
+    </select> 
+
+<select id="getStuOffCntAll" resultType="int" >
+	     select
+	       count(*)
+	     from dayoff
+</select>
+
+<select id="getStuOff" resultType="java.util.Map" >
+select
+	to_number(d.day_id)	"day_id"
+	,(select stu_name from student st where st.stu_id= d.stu_id) "stu_name" 
+	,d.stu_id  "stu_id"          
+	,(select stu_name from student st where st.stu_id= d.stu_id) "stu_name"                     
+    ,to_char(d.APPLICATION_DATE,'yyyy-mm-dd')         "application_date"  
+    ,to_char(d.DAYOFF_START,'yyyy-mm-dd')             "dayoff_start"
+    ,to_char(d.DAYOFF_END,'yyyy-mm-dd')               "dayoff_end"
+    ,d.PAYMENT_STATUS    "payment_status"                
+    ,d.DAYOFF_KIND 	"dayoff_kind"
+from dayoff  d 
+	where 1=1
+    <include refid="dayoffWhere"/>
+    order by to_number(d.day_id) desc
+</select>
+
+
+<insert id="insertStuOff" parameterType="com.naver.erp.DayOffDTO" >
+	insert into dayoff(
+			day_id
+			,stu_id
+			,dayoff_start
+			,dayoff_end
+			,dayoff_kind
+			,payment_status
+			,etc
+		) values(
+		 (select (nvl(max(to_number(day_id)),0)+1) from dayoff)
+			,#{stu_id}
+			,TO_DATE(#{dayoff_start}, 'YYYY-MM-DD"T"HH24:MI')			
+			,TO_DATE(#{dayoff_end}, 'YYYY-MM-DD"T"HH24:MI')
+			,#{dayoff_kind}
+			,'미결재'
+			,#{etc}
+		)
+</insert>
+
+ <delete id = "deleteStuOff" parameterType="com.naver.erp.DayOffDTO" >
+   			delete from dayoff
+   				where day_id=#{day_id}
+  </delete>
+
+   <update id = "upStuOff" parameterType="com.naver.erp.DayOffDTO" >
+	update dayoff
+		set
+			DAYOFF_START =to_date(#{dayoff_start},'YYYY-MM-DD"T"HH24:MI')
+			,DAYOFF_END	 =to_date(#{dayoff_end},'YYYY-MM-DD"T"HH24:MI')
+			,DAYOFF_KIND =#{dayoff_kind}
+			,ETC 		 =#{etc} 		
+		where 
+			day_id=#{day_id}	 
+</update>
+
+ <update id = "updateStuDayoffStatus" parameterType="com.naver.erp.DayOffDTO" >
+	update dayoff
+		set
+			PAYMENT_STATUS = #{payment_status}				
+		where 
+			day_id=#{day_id}	 
+</update>
+
+
+
+</mapper>

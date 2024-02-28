@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.naver.erp.ExamDAO">
+
+<insert id="insertExamInfo" parameterType="com.naver.erp.ExamDTO" >
+      insert into exam (
+           exam_id
+           , exam_name
+           , exam_date
+           , tea_id
+      ) values( 
+      (select (nvl(max(exam_id),0)+1) from exam)
+         ,#{exam_name}
+         ,to_date(#{exam_date},'yyyy-mm-dd')
+         ,#{tea_id}
+       )
+   </insert> 
+
+
+<insert id="examproblem" parameterType="com.naver.erp.ExamDTO">
+    INSERT ALL
+    INTO examproblem (exam_no, exam_question, exam_answer, exam_id)
+    SELECT
+        (select (nvl(max(exam_no),0)+1) from examproblem),
+        #{exam_question1}, #{exam_answer1},
+        (select exam_id from exam where exam_name=#{exam_name} and exam_date=to_date(#{exam_date}, 'yyyy-mm-dd'))
+    FROM DUAL
+    UNION ALL
+    SELECT
+        (select (nvl(max(exam_no),0)+2) from examproblem),
+        #{exam_question2}, #{exam_answer2},
+        (select exam_id from exam where exam_name=#{exam_name} and exam_date=to_date(#{exam_date}, 'yyyy-mm-dd'))
+    FROM DUAL
+    UNION ALL
+    SELECT
+        (select (nvl(max(exam_no),0)+3) from examproblem),
+        #{exam_question3}, #{exam_answer3},
+        (select exam_id from exam where exam_name=#{exam_name} and exam_date=to_date(#{exam_date}, 'yyyy-mm-dd'))
+    FROM DUAL
+    UNION ALL
+    SELECT
+        (select (nvl(max(exam_no),0)+4) from examproblem),
+        #{exam_question4}, #{exam_answer4},
+        (select exam_id from exam where exam_name=#{exam_name} and exam_date=to_date(#{exam_date}, 'yyyy-mm-dd'))
+    FROM DUAL
+    UNION ALL
+    SELECT
+        (select (nvl(max(exam_no),0)+5) from examproblem),
+        #{exam_question5}, #{exam_answer5},
+        (select exam_id from exam where exam_name=#{exam_name} and exam_date=to_date(#{exam_date}, 'yyyy-mm-dd'))
+    FROM DUAL
+    UNION ALL
+    SELECT
+        (select (nvl(max(exam_no),0)+6) from examproblem),
+        #{exam_question6}, #{exam_answer6},
+        (select exam_id from exam where exam_name=#{exam_name} and exam_date=to_date(#{exam_date}, 'yyyy-mm-dd'))
+    FROM DUAL
+    UNION ALL
+    SELECT
+        (select (nvl(max(exam_no),0)+7) from examproblem),
+        #{exam_question7}, #{exam_answer7},
+        (select exam_id from exam where exam_name=#{exam_name} and exam_date=to_date(#{exam_date}, 'yyyy-mm-dd'))
+    FROM DUAL
+    UNION ALL
+    SELECT
+        (select (nvl(max(exam_no),0)+8) from examproblem),
+        #{exam_question8}, #{exam_answer8},
+        (select exam_id from exam where exam_name=#{exam_name} and exam_date=to_date(#{exam_date}, 'yyyy-mm-dd'))
+    FROM DUAL
+    UNION ALL
+    SELECT
+        (select (nvl(max(exam_no),0)+9) from examproblem),
+        #{exam_question9}, #{exam_answer9},
+        (select exam_id from exam where exam_name=#{exam_name} and exam_date=to_date(#{exam_date}, 'yyyy-mm-dd'))
+    FROM DUAL
+    UNION ALL
+    SELECT
+        (select (nvl(max(exam_no),0)+10) from examproblem),
+        #{exam_question10}, #{exam_answer10},
+        (select exam_id from exam where exam_name=#{exam_name} and exam_date=to_date(#{exam_date}, 'yyyy-mm-dd'))
+    FROM DUAL
+</insert>
+
+<insert id="insertExamScore" parameterType="com.naver.erp.ExamDTO" >
+   insert into examresult (
+        exam_id
+        , stu_id
+        , score
+   ) values( 
+   		#{exam_id}
+   		,#{stu_id}
+   		,#{score}      
+    )
+</insert> 
+	   
+ <update id="updateExamInfo" parameterType="com.naver.erp.ExamDTO">
+   update EXAM
+   set 
+       exam_name = #{exam_name}
+       , exam_date = to_date(#{exam_date}, 'yyyy-mm-dd')
+   where exam_id = ${exam_id}
+</update>
+
+ 
+ <update id="updateExamproblem1" parameterType="com.naver.erp.ExamDTO">
+        UPDATE examproblem
+        SET exam_question = #{exam_question1}
+        , exam_answer = #{exam_answer1}
+        WHERE exam_id = ${exam_id} AND exam_no = ${exam_no1}
+    </update>
+
+<update id="updateExamproblem2" parameterType="com.naver.erp.ExamDTO">
+        UPDATE examproblem
+        SET exam_question = #{exam_question2}
+        , exam_answer = #{exam_answer2}
+        WHERE exam_id = ${exam_id} AND exam_no = ${exam_no2}
+    </update>
+    
+    <update id="updateExamproblem3" parameterType="com.naver.erp.ExamDTO">
+        UPDATE examproblem
+        SET exam_question = #{exam_question3}
+        , exam_answer = #{exam_answer3}
+        WHERE exam_id = ${exam_id} AND exam_no = ${exam_no3}
+    </update>
+    
+    <update id="updateExamproblem4" parameterType="com.naver.erp.ExamDTO">
+        UPDATE examproblem
+        SET exam_question = #{exam_question4}
+        , exam_answer = #{exam_answer4}
+        WHERE exam_id = ${exam_id} AND exam_no = ${exam_no4}
+    </update>
+    
+        <update id="updateExamproblem5" parameterType="com.naver.erp.ExamDTO">
+        UPDATE examproblem
+        SET exam_question = #{exam_question5}
+        , exam_answer = #{exam_answer5}
+        WHERE exam_id = ${exam_id} AND exam_no = ${exam_no5}
+    </update>
+    
+        <update id="updateExamproblem6" parameterType="com.naver.erp.ExamDTO">
+        UPDATE examproblem
+        SET exam_question = #{exam_question6}
+        , exam_answer = #{exam_answer6}
+        WHERE exam_id = ${exam_id} AND exam_no = ${exam_no6}
+    </update>
+    
+        <update id="updateExamproblem7" parameterType="com.naver.erp.ExamDTO">
+        UPDATE examproblem
+        SET exam_question = #{exam_question7}
+        , exam_answer = #{exam_answer7}
+        WHERE exam_id = ${exam_id} AND exam_no = ${exam_no7}
+    </update>
+    
+        <update id="updateExamproblem8" parameterType="com.naver.erp.ExamDTO">
+        UPDATE examproblem
+        SET exam_question = #{exam_question8}
+        , exam_answer = #{exam_answer8}
+        WHERE exam_id = ${exam_id} AND exam_no = ${exam_no8}
+    </update>
+    
+        <update id="updateExamproblem9" parameterType="com.naver.erp.ExamDTO">
+        UPDATE examproblem
+        SET exam_question = #{exam_question9}
+        , exam_answer = #{exam_answer9}
+        WHERE exam_id = ${exam_id} AND exam_no = ${exam_no9}
+    </update>
+    
+        <update id="updateExamproblem10" parameterType="com.naver.erp.ExamDTO">
+        UPDATE examproblem
+        SET exam_question = #{exam_question10}
+        , exam_answer = #{exam_answer10}
+        WHERE exam_id = ${exam_id} AND exam_no = ${exam_no10}
+    </update>
+
+	<delete id="deleteExamproblem" parameterType="com.naver.erp.ExamDTO">
+       delete from examproblem where exam_id = ${exam_id} 
+       </delete>
+    
+    <delete id="deleteExamInfo" parameterType="com.naver.erp.ExamDTO">
+       delete from exam where exam_id = ${exam_id}
+    </delete>  
+    
+	
+   <select id="getExamListCnt" resultType="int" >
+	     select
+	       count(*)
+	          from exam
+	          where 1=1
+	          <if test="tea_id!=null and tea_id.length()>0">
+	          and tea_id = #{tea_id}
+	          </if>
+	          <if test="stu_id!=null and stu_id.length()>0">
+	          and class_id=(select class_id from class_join_stu where stu_id = #{stu_id})
+	          </if>
+	          
+          </select> 
+     <select id="getExamListCntAll" resultType="int" >
+	     select
+	       count(*)
+	          from exam
+          </select>
+          
+	  <select id="getExamList" resultType="java.util.Map" >
+	     select
+	     <![CDATA[
+	     	  case
+	               when  to_char(exam_date,'yyyy-mm-dd') < to_char(sysdate,'yyyy-mm-dd') then '응시 종료'    
+	               when  to_char(exam_date,'yyyy-mm-dd') = to_char(sysdate,'yyyy-mm-dd') then '응시 중'  
+	               when  to_char(exam_date,'yyyy-mm-dd') > to_char(sysdate,'yyyy-mm-dd') then '응시 전'       
+               end "is_end"
+               ]]>
+	       	  ,exam_id                           "exam_id"
+	          , exam_name                        "exam_name"
+	          ,to_char(e.exam_date,'yyyy-mm-dd')   "exam_date"
+	          , (select tea_name from teacher t where e.tea_id = t.tea_id)       "tea_name"
+	          ,class_id "class_id"
+	          <if test="stu_id!=null and stu_id.length()>0">
+			  ,nvl((select score||'점' from examresult er where stu_id = #{stu_id} and e.exam_id = er.exam_id), '-') "score"
+	          </if>
+	          from exam e
+	          where 1=1
+	          <if test="tea_id!=null and tea_id.length()>0">
+	          and tea_id = #{tea_id}
+	          </if>
+	          <if test="stu_id!=null and stu_id.length()>0">
+	          and class_id=(select class_id from class_join_stu where stu_id = #{stu_id})
+	          </if>
+	  
+          </select> 
+      
+      <select id="getExamDetailInfo" resultType="java.util.Map">
+     	 select 
+            exam_id "exam_id"
+            ,exam_name "exam_name"
+            ,to_char(exam_date,'yyyy-mm-dd') "exam_date"
+            ,(select tea_name from teacher where tea_id='asd') "tea_id"
+         from exam
+            where exam_id = ${exam_id}
+      </select>
+      <select id="getExamDetailProblem" resultType="java.util.Map">
+         select * from (   select rownum RNUM, zxcvb.* from (    
+            select
+                exam_id "exam_id"
+                ,exam_no "exam_no"
+                ,exam_question    "exam_question"  
+            from examproblem  
+            where exam_id = ${exam_id}
+            order by  exam_no
+             <![CDATA[
+          ) zxcvb) where RNUM>=1 and RNUM<=10
+            ]]>
+      </select>
+      <select id="getExamDetailAnswer" resultType="java.util.Map">
+          select * from (   select rownum RNUM, zxcvb.* from (    
+            select
+                exam_id "exam_id"
+                ,exam_no "exam_no"
+                ,exam_answer  "exam_answer"   
+            from examproblem  
+            where exam_id = ${exam_id}
+            order by  exam_no
+                <![CDATA[
+          ) zxcvb) where RNUM>=1 and RNUM<=10
+            ]]>
+      </select>
+       <select id="getStuExamScoreList" resultType="java.util.Map">
+	    	select 
+                stu_name "stu_name"
+                ,nvl((select score||'점' from examresult er where s.stu_id = er.stu_id),'미응시') "score"
+            from student s
+            where 
+            	s.stu_id in 
+            	(select stu_id from class_join_stu where class_id = ${class_id})
+      </select>
+      
+      
+      
+
+</mapper>

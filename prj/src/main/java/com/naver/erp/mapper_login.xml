@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.naver.erp.LoginDAO">
+
+   <select id="stu_LoginIdCnt" parameterType="hashmap" resultType="int">
+		select count(*) from STUDENT
+		 where STU_ID=#{stu_id} and STU_PWD=#{stu_pwd}
+			
+   </select>
+   
+<select id="tea_LoginIdCnt" parameterType="hashmap" resultType="int">
+		select count(*) from Teacher
+		 where tea_ID=#{tea_id} and tea_PWD=#{tea_pwd}
+	</select>
+	
+	<select id="mana_LoginIdCnt" parameterType="hashmap" resultType="int">
+		select count(*) from MANAGER
+		 where mana_ID=#{mana_id} and mana_PWD=#{mana_pwd}
+	</select>
+	
+	<select id="whatRole" parameterType="java.lang.String" resultType="java.lang.String">
+		SELECT 
+		    CASE 
+		        WHEN #{id} = t.tea_id THEN 'tea'
+		        WHEN #{id} = s.stu_id THEN 'stu'
+		        WHEN #{id} = m.mana_id THEN 'mana'
+		    END "result"
+		FROM 
+		    teacher t
+		    FULL OUTER JOIN student s ON 1=0 
+		    FULL OUTER JOIN manager m ON 1=0 
+		WHERE 
+		    #{id} IN (t.tea_id, s.stu_id, m.mana_id);
+    </select>
+   
+</mapper>

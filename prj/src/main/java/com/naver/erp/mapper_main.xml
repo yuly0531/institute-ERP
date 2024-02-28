@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.naver.erp.MainDAO">
+    
+	<select id="StudentMainList" resultType="java.util.Map">
+	   SELECT * FROM student
+	</select>
+	<select id="TeacherMainList" resultType="java.util.Map">
+	   SELECT * FROM TEACHER
+	</select>
+	<select id="getManaList" resultType="java.util.Map">
+	   SELECT * FROM MANAGER
+	</select>
+	<select id="getClassList" resultType="java.util.Map">
+	   SELECT
+	    class_name "class_name"
+	FROM class
+	</select>
+	<select id="whatRole" parameterType="java.lang.String" resultType="java.lang.String">
+		SELECT
+		    CASE
+		        WHEN #{mid} IN (SELECT mana_id FROM manager) THEN '관리자'
+		        WHEN #{mid} IN (SELECT tea_id FROM teacher) THEN '강사'
+		        WHEN #{mid} IN (SELECT stu_id FROM student) THEN '학생'
+		        ELSE '해당 없음'
+		    END "role"
+	    from dual
+	</select>
+	<!-- 서니 -->
+	<select id="getRegistStuCnt" resultType="java.util.Map">
+		select 
+	    (select count(*) from student where to_char(regist_date,'yyyy-mm-dd') = to_char(sysdate,'yyyy-mm-dd')) "COUNT_0"
+	    , (select count(*) from student where to_char(regist_date,'yyyy-mm-dd') = to_char(sysdate-1,'yyyy-mm-dd')) "COUNT_1"
+	    , (select count(*) from student where to_char(regist_date,'yyyy-mm-dd') = to_char(sysdate-2,'yyyy-mm-dd')) "COUNT_2"
+	    , (select count(*) from student where to_char(regist_date,'yyyy-mm-dd') = to_char(sysdate-3,'yyyy-mm-dd')) "COUNT_3"
+	    , (select count(*) from student where to_char(regist_date,'yyyy-mm-dd') = to_char(sysdate-4,'yyyy-mm-dd')) "COUNT_4"
+	    , (select count(*) from student where to_char(regist_date,'yyyy-mm-dd') = to_char(sysdate-5,'yyyy-mm-dd')) "COUNT_5"
+	    , (select count(*) from student where to_char(regist_date,'yyyy-mm-dd') = to_char(sysdate-6,'yyyy-mm-dd')) "COUNT_6"
+	    from dual
+    </select>
+    
+	<select id="getTeaCnt" resultType="java.util.Map">
+	    SELECT 
+	    all_tea_cnt,
+	    dayoff_tea_cnt,
+	    all_tea_cnt - dayoff_tea_cnt AS work_tea_cnt
+		FROM (
+		    SELECT 
+		        (SELECT COUNT(*) FROM teacher) AS all_tea_cnt,
+		        (SELECT COUNT(*) 
+		         FROM teacher t
+		         WHERE t.tea_id = (
+		             SELECT td.tea_id 
+		             FROM tea_dayoff td 
+		             WHERE TO_NUMBER(TO_CHAR(SYSDATE,'yyyymmdd')) BETWEEN TO_NUMBER(TO_CHAR(dayoff_start,'yyyymmdd')) AND TO_NUMBER(TO_CHAR(dayoff_end,'yyyymmdd'))
+		         )
+		        ) AS dayoff_tea_cnt
+		    FROM dual
+		)
+	</select>
+	
+	<select id="getClassInfoCnt" resultType="java.util.Map">
+		SELECT 
+	        (select count(*) from class)  "all_class_cnt"
+	        ,(select count(*) 
+	         FROM class
+	         WHERE 
+	             TO_NUMBER(TO_CHAR(SYSDATE,'yyyymmdd')) BETWEEN TO_NUMBER(TO_CHAR(class_start_date,'yyyymmdd')) AND TO_NUMBER(TO_CHAR(class_end_date,'yyyymmdd'))) "due_class_cnt"
+	        ,(select count(*) 
+	         FROM class
+	         WHERE 
+	         <![CDATA[
+	             TO_NUMBER(TO_CHAR(SYSDATE,'yyyymmdd')) < TO_NUMBER(TO_CHAR(class_start_date,'yyyymmdd'))) "yet_class_cnt"
+	        ,(select count(*) 
+	         FROM class
+	         WHERE 
+	             TO_NUMBER(TO_CHAR(SYSDATE,'yyyymmdd')) > TO_NUMBER(TO_CHAR(class_end_date,'yyyymmdd'))) "end_class_cnt"
+	    	]]>
+	    from dual
+    </select>
+	<select id="getdayoffInfo" resultType="java.util.Map">
+	    select
+		   (select stu_name from student s where df.stu_id = s.stu_id) "who_name"
+		   ,to_char(application_date,'yyyy-mm-dd') "regist_date"                               
+		   ,payment_status "status"                            
+		   ,dayoff_kind "dayoff_kind"
+		from dayoff df
+		union all
+		select
+		   (select tea_name from teacher t where df.tea_id = t.tea_id)
+		   ,to_char(application_date,'yyyy-mm-dd')                    
+		   ,payment_status
+		   ,tea_dayoff_kind
+		from tea_dayoff df
+    </select>
+
+
+	<select id="getExamInfoList" parameterType="com.naver.erp.ExamDTO" resultType="java.util.Map" >		
+		select
+	  	EXAM_ID       			"exam_id"
+	  	,EXAM_NAME    			"exam_name"
+	 	 ,to_char(EXAM_DATE,'yyyy-mm-dd')    "exam_date"  
+	 	<![CDATA[
+		    ,case
+		     when  to_char(exam_date,'yyyy-mm-dd') < to_char(sysdate,'yyyy-mm-dd') then '응시 종료'    
+		     when  to_char(exam_date,'yyyy-mm-dd') = to_char(sysdate,'yyyy-mm-dd') then '응시 중'  
+		     when  to_char(exam_date,'yyyy-mm-dd') > to_char(sysdate,'yyyy-mm-dd') then '응시 전'       
+	         end "is_end"
+	    ]]>
+	  	,(select class_name from class cla where cla.class_id = e.class_id)   "class_name"
+		from EXAM e
+		where
+			tea_id=#{tea_id}
+	</select>
+	
+	<select id="getDayOffInfoList" parameterType="com.naver.erp.DayOffDTO" resultType="java.util.Map" >		
+		select 
+		DAY_ID             
+		,(select tea_name from teacher t where t.tea_id = d.tea_id)   "tea_name"             
+		  ,to_char(APPLICATION_DATE,'yyyy-mm-dd') "application_date"   
+		  ,DAYOFF_START   	"dayoff_start"    
+		  ,DAYOFF_END       "dayoff_end"   
+		  ,PAYMENT_STATUS   "payment_status"            
+		  ,TEA_DAYOFF_KIND	"tea_dayoff_kind"
+		from tea_dayoff   d
+		where tea_id = #{tea_id}
+	</select>
+</mapper>
